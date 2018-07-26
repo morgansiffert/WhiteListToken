@@ -183,10 +183,10 @@ contract MyAdvancedToken is owned, TokenERC20 {
     uint256 public sellPrice;
     uint256 public buyPrice;
 
-    mapping (address => bool) public frozenAccount;
+    mapping (address => bool) public whiteListAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
-    event FrozenFunds(address target, bool frozen);
+    event WhiteListAddress(address target, bool white);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function MyAdvancedToken(
@@ -200,8 +200,8 @@ contract MyAdvancedToken is owned, TokenERC20 {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);               // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
-        require(!frozenAccount[_from]);                     // Check if sender is frozen
-        require(!frozenAccount[_to]);                       // Check if recipient is frozen
+        require(whiteListAccount[_from]);                     // Check if sender is whiteListed
+        require(whiteListAccount[_to]);                       // Check if recipient is whiteListed
         balanceOf[_from] -= _value;                         // Subtract from the sender
         balanceOf[_to] += _value;                           // Add the same to the recipient
         emit Transfer(_from, _to, _value);
@@ -218,11 +218,11 @@ contract MyAdvancedToken is owned, TokenERC20 {
     }
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
-    /// @param target Address to be frozen
-    /// @param freeze either to freeze it or not
-    function freezeAccount(address target, bool freeze) onlyOwner public {
-        frozenAccount[target] = freeze;
-        emit FrozenFunds(target, freeze);
+    /// @param target Address to be whiteListed
+    /// @param whiteList either to whiteList it or not
+    function whiteListAccount(address target, bool whiteList) onlyOwner public {
+        whiteListAccount[target] = whiteList;
+        emit WhiteListAddress(target, whiteList);
     }
 
     /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
