@@ -3,7 +3,7 @@ pragma solidity ^0.4.16;
 contract owned {
     address public owner;
 
-    function owned() public {
+    constructor() public {
         owner = msg.sender;
     }
 
@@ -45,7 +45,7 @@ contract TokenERC20 {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function TokenERC20(
+    constructor(
         uint256 initialSupply,
         string tokenName,
         string tokenSymbol
@@ -183,13 +183,13 @@ contract MyAdvancedToken is owned, TokenERC20 {
     uint256 public sellPrice;
     uint256 public buyPrice;
 
-    mapping (address => bool) public whiteListAccount;
+    mapping (address => bool) public whiteList;
 
     /* This generates a public event on the blockchain that will notify clients */
     event WhiteListAddress(address target, bool white);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function MyAdvancedToken(
+    constructor(
         uint256 initialSupply,
         string tokenName,
         string tokenSymbol
@@ -200,8 +200,8 @@ contract MyAdvancedToken is owned, TokenERC20 {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);               // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
-        require(whiteListAccount[_from]);                     // Check if sender is whiteListed
-        require(whiteListAccount[_to]);                       // Check if recipient is whiteListed
+        require(whiteList[_from]);                     // Check if sender is whiteListed
+        require(whiteList[_to]);                       // Check if recipient is whiteListed
         balanceOf[_from] -= _value;                         // Subtract from the sender
         balanceOf[_to] += _value;                           // Add the same to the recipient
         emit Transfer(_from, _to, _value);
@@ -219,10 +219,10 @@ contract MyAdvancedToken is owned, TokenERC20 {
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be whiteListed
-    /// @param whiteList either to whiteList it or not
-    function whiteListAccount(address target, bool whiteList) onlyOwner public {
-        whiteListAccount[target] = whiteList;
-        emit WhiteListAddress(target, whiteList);
+    /// @param white either to whiteList it or not
+    function whiteListAccount(address target, bool white) onlyOwner public {
+        whiteList[target] = white;
+        emit WhiteListAddress(target, white);
     }
 
     /// @notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
